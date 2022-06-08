@@ -19,6 +19,7 @@
     "sequelize": "^6.20.1"
   },
   "devDependencies": {
+    "@handlebars/allow-prototype-access": "^1.0.5",
     "nodemon": "^2.0.16"
   }
 }
