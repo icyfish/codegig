@@ -3,7 +3,10 @@
     <h1>Add A Gig</h1>
     <p>Your contact email will be shared with registered users to apply to your
       gig</p>
-    <form>
+    {{#each errors}}
+      <p>{{text}}</p>
+    {{/each}}
+    <form action="/gigs/add" method="post">
       <div class="input-group">
         <label for="title">Gig Title</label>
         <input
@@ -14,6 +17,7 @@
           placeholder="eg. Small Wordpress website, React developer"
           maxlength="100"
           required
+					value="{{title}}"
         />
       </div>
       <div class="input-group">
@@ -25,6 +29,7 @@
           class="input-box"
           placeholder="eg. javascript, react, PHP"
           maxlength="100"
+					value="{{technologies}}"
         />
       </div>
       <div class="input-group">
@@ -35,6 +40,7 @@
           id="budget"
           class="input-box"
           placeholder="eg. 500, 5000, 10000"
+					value="{{budget}}"
         />
       </div>
       <div class="input-group">
@@ -46,7 +52,7 @@
           placeholder="Describe the details of the gig"
           rows="10"
           required
-        ></textarea>
+        >{{description}}</textarea>
       </div>
       <div class="input-group">
         <label for="budget">Contact Email</label>
@@ -57,6 +63,7 @@
           class="input-box"
           placeholder="Enter an email"
           required
+					value="{{contact_email}}"
         />
       </div>
       <input type="submit" value="Add Gig" class="btn btn-reverse" />

@@ -5,7 +5,6 @@ const {
   allowInsecurePrototypeAccess
 } = require("@handlebars/allow-prototype-access");
 
-const bodyParser = require("body-parser");
 const path = require("path");
 
 // Database
@@ -28,6 +27,9 @@ app.engine(
   })
 );
 app.set("view engine", "handlebars");
+
+// Body Parser
+app.use(express.urlencoded({ extended: false }));
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));

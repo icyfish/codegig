@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/database");
 const Gig = require("../models/Gig");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 // get git list
 router.get("/", (req, res) => {
@@ -18,27 +20,60 @@ router.get("/add", (req, res) => {
 });
 
 // add a gig
-router.get("/add", (req, res) => {
-  const data = {
-    title: "Simple Wordpress website",
-    technologies: "wordpress, php",
-    budget: "$1000",
-    description:
-      "Magna aute officia labore laborum eiusmod elit aliquip qui non minim sit duis. Ad non esse enim ea. Non ex culpa est sint reprehenderit elit in tempor reprehenderit labore laborum. Eiusmod culpa consectetur aliqua exercitation amet culpa. Nostrud reprehenderit tempor ea duis irure sint eiusmod minim excepteur non deserunt. Ea qui sit aliqua pariatur ut duis commodo officia.",
-    contact_email: "user1@gmail.com"
-  };
+router.post("/add", (req, res) => {
+  let { title, technologies, budget, description, contact_email } = req.body;
 
-  let { title, technologies, budget, description, contact_email } = data;
+  let errors = [];
+  // Validate Fields
+  if (!title) {
+    errors.push({ text: "Please add a title" });
+  }
+  if (!technologies) {
+    errors.push({ text: "Please add some technologies" });
+  }
+  if (!description) {
+    errors.push({ text: "Please add a description" });
+  }
+  if (!contact_email) {
+    errors.push({ text: "Please add a contact email" });
+  }
 
-  // Insert into table
-  Gig.create({
-    title,
-    technologies,
-    budget,
-    description,
-    contact_email
+  // check for errors
+  if (errors.length > 0) {
+    res.render("add", {
+      errors,
+      title,
+      technologies,
+      budget,
+      description,
+      contact_email
+    });
+  } else {
+    if (!budget) {
+      budget = "Unknown";
+    } else {
+      budget = `$${budget}`;
+    }
+    // lowercase and remove space after comma
+    technologies = technologies.toLowerCase().replace(/, /g, ",");
+
+    // Insert into table
+    Gig.create({ title, technologies, budget, description, contact_email })
+      .then(gig => res.redirect("/gigs"))
+      .catch(err => console.log(err));
+  }
+});
+
+// Search for gigs
+router.get("/search", (req, res) => {
+  let { term } = req.query;
+
+	term = term.toLowerCase();
+  Gig.findAll({
+    // anywhere
+    where: { technologies: { [Op.like]: `%${term}%` } }
   })
-    .then(gig => res.redirect("/gigs"))
+    .then(gigs => res.render("gigs", { gigs }))
     .catch(err => console.log(err));
 });
 module.exports = router;
